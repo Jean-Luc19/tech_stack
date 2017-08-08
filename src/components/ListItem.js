@@ -1,5 +1,9 @@
 import React, { Component } from 'react';
-import { Text, TouchableWithoutFeedback, View } from 'react-native';
+import { Text,
+  TouchableWithoutFeedback,
+  View,
+  LayoutAnimation
+ } from 'react-native';
 import { connect } from 'react-redux';
 import * as actions from '../actions';
 import { CardSection } from './common';
@@ -7,14 +11,23 @@ import { CardSection } from './common';
 
 class ListItem extends Component {
 
+  componentWillUpdate() {
+    LayoutAnimation.spring();
+  }
+
   renderDescription() {
-    const { library, selectedId } = this.props;
-    if (library.id === selectedId) {
+    const { library } = this.props;
+    if (this.props.expanded) {
       return (
-        <Text>{library.description}</Text>
+        <CardSection>
+          <Text style={styles.textStyle}>
+            {library.description}
+          </Text>
+        </CardSection>
       );
     }
   }
+
   render() {
     const { titleStyle } = styles;
     const { id, title } = this.props.library;
@@ -39,10 +52,18 @@ const styles = {
   titleStyle: {
     fontSize: 18,
     paddingLeft: 15
+  },
+  textStyle: {
+    flex: 1,
+    paddingLeft: 15,
+    fontStyle: 'italic'
   }
 };
 
-const mapStateToProps = state => ({
-  selectedId: state.selection
-});
+const mapStateToProps = (state, ownProps) => {
+  const expanded = state.selection === ownProps.library.id;
+  return {
+    expanded
+  };
+};
 export default connect(mapStateToProps, actions)(ListItem);
